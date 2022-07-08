@@ -2,9 +2,9 @@ use std::cmp::min;
 use std::fs::File;
 use std::io::Write;
 
-use reqwest::Client;
-use indicatif::{ProgressBar, ProgressStyle};
 use futures_util::StreamExt;
+use indicatif::{ProgressBar, ProgressStyle};
+use reqwest::Client;
 
 pub async fn download_file(client: &Client, url: &str, path: &str) -> Result<(), String> {
     // Reqwest setup
@@ -16,7 +16,7 @@ pub async fn download_file(client: &Client, url: &str, path: &str) -> Result<(),
     let total_size = res
         .content_length()
         .ok_or(format!("Failed to get content length from '{}'", &url))?;
-    
+
     // Indicatif setup
     let pb = ProgressBar::new(total_size);
     pb.set_style(ProgressStyle::default_bar()
@@ -45,9 +45,9 @@ pub async fn download_file(client: &Client, url: &str, path: &str) -> Result<(),
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let body = reqwest::get("https://www.rust-lang.org/tools/install")
-    .await?
-    .text()
-    .await?;
+        .await?
+        .text()
+        .await?;
 
     let client = reqwest::Client::new();
     // println!("{:#?}", body);
@@ -57,14 +57,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let main_div = document.select(&main_div_selector).next().unwrap();
 
     let u_div_selector = scraper::Selector::parse("div.pa2>a").unwrap();
-    
+
     for div in main_div.select(&u_div_selector) {
         let download_url = div.value().attr("href").unwrap();
         if download_url.find("x86_64") != None {
             println!("Downloading {}", download_url);
-            download_file(&client, download_url, "rustup-init.exe").await.unwrap();
+            download_file(&client, download_url, "rustup-init.exe")
+                .await
+                .unwrap();
         }
     }
-	
-	Ok(())
+
+    Ok(())
 }
